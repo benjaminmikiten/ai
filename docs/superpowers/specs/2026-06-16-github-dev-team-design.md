@@ -12,8 +12,16 @@ A composable set of Claude Code skills that simulate a software development team
 GitHub issue labels track workflow position:
 
 ```
-needs-po → needs-po-approval → needs-tech-lead → needs-adr-approval → needs-engineering → in-progress → needs-review → done
+needs-po → prd-pending → prd-approved → adr-pending → adr-approved → in-progress → needs-review → done
 ```
+
+Label transitions:
+- `/po` runs → applies `prd-pending`
+- Next invocation reads approval comment → transitions to `prd-approved`
+- `/tech-lead` runs → applies `adr-pending`
+- Next invocation reads approval comment → transitions to `adr-approved`
+- `/engineer` runs → applies `in-progress`
+- `/review` approves → applies `done`
 
 Each skill checks the current label state before acting and refuses to run if preconditions are not met.
 
@@ -47,22 +55,22 @@ Lives in each target repo. Defines:
 1. Read issue body and existing comments.
 2. If a PRD draft exists and has revision comments from the user: incorporate feedback, update `docs/prd/` on the branch, re-post as a comment.
 3. If no PRD exists: draft PRD using the `to-prd` template, open branch `feature/<issue>-<slug>`, commit to `docs/prd/<issue>-<slug>.md`, post as issue comment.
-4. Apply label `needs-po-approval`.
+4. Apply label `prd-pending`.
 5. Halt — post a comment directing the user to review on GitHub.
 
 ### `/tech-lead #<issue>`
 
-**Precondition:** Issue has `prd-approved` label or a clear approval comment.
+**Precondition:** Issue has `prd-approved` label (i.e. approval comment has been detected and label transitioned from `prd-pending`).
 
 1. Read PRD from branch.
 2. Draft ADR: problem, alternatives considered, decision, consequences.
 3. Commit to `docs/adr/<issue>-<slug>.md` on the existing feature branch.
 4. Post ADR as issue comment.
-5. Apply label `needs-adr-approval`. Halt.
+5. Apply label `adr-pending`. Halt.
 
 ### `/engineer #<issue>`
 
-**Precondition:** Issue has `adr-approved` label or a clear approval comment.
+**Precondition:** Issue has `adr-approved` label.
 
 **First invocation (no child issues yet):**
 1. Call `/to-issues` on the ADR to produce vertical-slice child issues with `ready-for-agent` label.
@@ -89,7 +97,7 @@ Orchestrates the full chain. On each invocation:
 
 1. Read current issue label state.
 2. Advance to the next runnable skill.
-3. At HITL gates (`needs-po-approval`, `needs-adr-approval`): halt and post a message directing the user to GitHub.
+3. At HITL gates (`prd-pending`, `adr-pending`): read comment thread for approval signal. If approved, transition label (`prd-pending` → `prd-approved`, `adr-pending` → `adr-approved`) and continue. If revision requested, re-invoke the appropriate skill with extracted feedback. If no response, halt and direct user to GitHub.
 4. In the engineer-review loop: re-invoke `/engineer` until `/review` approves, then merge and close.
 
 ## Engineer–Review Loop
