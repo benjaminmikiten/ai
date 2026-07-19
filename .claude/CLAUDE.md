@@ -24,3 +24,18 @@ ln -sf ~/projects/ai/CLAUDE.md ~/.claude/CLAUDE.md
 # Mirror each skill:
 for f in ~/projects/ai/skills/*; do ln -sf "$f" ~/.claude/skills/; done
 ```
+
+Alternatively, install `skills/` as a plugin (see below) instead of running `setup.sh` — `CLAUDE.md` still needs the manual symlink either way, since plugins have no mechanism to inject into the global `CLAUDE.md`.
+
+## Plugin marketplace
+
+This repo doubles as a Claude Code plugin marketplace (`.claude-plugin/marketplace.json` + `.claude-plugin/plugin.json` at repo root). It publishes one plugin, `skills`, whose source is the repo root, so anything dropped under `skills/<name>/SKILL.md` is picked up automatically — no manifest edits needed.
+
+To install on any machine:
+
+```
+/plugin marketplace add benjaminmikiten/ai
+/plugin install skills@benjaminmikiten
+```
+
+Run `claude plugin validate .` from the repo root after editing either manifest.

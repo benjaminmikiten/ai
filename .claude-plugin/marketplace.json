@@ -1,0 +1,15 @@
+{
+  "name": "benjaminmikiten",
+  "owner": {
+    "name": "Ben Mikiten",
+    "email": "benjamin.mikiten@gmail.com"
+  },
+  "description": "Ben Mikiten's personal Claude Code skills and config",
+  "plugins": [
+    {
+      "name": "skills",
+      "source": "./",
+      "description": "Personal skills and config for Claude Code"
+    }
+  ]
+}
