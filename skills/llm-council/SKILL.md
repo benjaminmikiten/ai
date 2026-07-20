@@ -25,7 +25,7 @@ Fire 5 `Agent` tool calls in a single message (5 tool-use blocks, all in paralle
 
 - The user's question/context verbatim.
 - That persona's role definition (from the list above).
-- This exact instruction appended: "Do not use any tools. Reason only from the question and context given here. Answer in your persona's voice and priorities."
+- This exact instruction appended: "Do not use any tools. Reason only from the question and context given here. Answer in your persona's voice and priorities. Do not name or refer to your persona role anywhere in your answer text (e.g. do not write 'As the Contrarian...') — your answer will be shown anonymously to other personas in the next stage, and self-identifying language would break that anonymity."
 
 Collect the 5 outputs into `{persona_name: answer_text}`. If any single call fails or errors, retry that call once. If it still fails, proceed without that persona's contribution — record that this persona's Stage 1 answer is missing; carry that gap forward into Stage 2 (skip generating a Stage 2 critique *from* that persona, but still include its Stage 1 answer as one of the anonymized responses reviewed by the other 4 *if it succeeded* — only omit it if Stage 1 itself failed) and into the final output (see Error handling).
 
@@ -35,7 +35,7 @@ Fire 5 more `Agent` tool calls in a single message (5 tool-use blocks, all in pa
 
 - The original question.
 - That persona's role definition (same text as Stage 1 — it critiques through its own lens).
-- The *other* 4 personas' Stage 1 answers, anonymized: labeled `Response A`, `Response B`, `Response C`, `Response D` in a fixed but arbitrary order. Do not include persona names anywhere in this prompt. The persona reviewing must never see its own Stage 1 answer among the four — exclude it before anonymizing and labeling.
+- The *other* 4 personas' Stage 1 answers, anonymized: labeled `Response A`, `Response B`, `Response C`, `Response D`. Use this fixed order for labeling — take the persona list order from the Personas section above (Contrarian, Assumption-ripper, Expansionist, Outsider, Executor), drop the reviewing persona itself, and assign A/B/C/D to the remaining four in that same relative order. Apply this rule identically for every Stage 2 call. Do not include persona names anywhere in this prompt. The persona reviewing must never see its own Stage 1 answer among the four — exclude it before anonymizing and labeling. If a Stage 1 answer self-identifies its persona despite the instruction not to, strip or paraphrase away the identifying phrase before including it as an anonymized response.
 - This exact instruction appended: "Critique each of the 4 responses from your persona's angle — where do they fail, what's missing, what would you push back on. No tools."
 
 Collect the outputs into `{persona_name: critique_text}`. Apply the same retry-once-then-proceed-without rule as Stage 1 (see Error handling).
