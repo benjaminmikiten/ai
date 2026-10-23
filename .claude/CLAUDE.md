@@ -39,3 +39,9 @@ To install on any machine:
 ```
 
 Run `claude plugin validate .` from the repo root after editing either manifest.
+
+## Conventions for skills
+
+- Keep skills here generic: no references to private repos, task trackers or personal style. Where a skill needs taste, it reads a file the user owns (e.g. `draft-post` reads the user's `VOICE.md`). Personal plumbing goes in a private marketplace instead.
+- Give each skill a `README.md` with a "What I've used it on" log. My website's skills page is built from these.
+- Leave `version` out of `plugin.json`, so installs track commits and a push to `main` is a release. See `docs/pattern.md`.
